@@ -29,14 +29,18 @@ router.post('/', (req, res) => {
   res.status(201).json({ success: true, data: newTask });
 });
 
-// NEW: Get a task by ID (1-5)
+// GET task by ID with proper invalid ID handling
 router.get('/task/:id', (req, res) => {
-  const taskId = Number(req.params.id);
+  const idParam = req.params.id;
+
+  if (!/^\d+$/.test(idParam)) { // check if numeric
+    return res.status(400).json({ error: "Invalid ID format" });
+  }
+
+  const taskId = Number(idParam);
   const task = req.app.locals.tasks.find(t => t.id === taskId);
 
-  if (!task) {
-    return res.status(404).json({ error: "Task not found" });
-  }
+  if (!task) return res.status(404).json({ error: "Task not found" });
 
   res.json({ success: true, data: task });
 });
